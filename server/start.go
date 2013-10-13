@@ -5,6 +5,6 @@ import (
 )
 
 func Start() {
-	http.HandleFunc("/", GameDataHandle)
+	http.HandleFunc("/", IndexHandle)
 	http.ListenAndServe(":8080", nil)
 }
