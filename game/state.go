@@ -27,17 +27,11 @@ func (s *State) Read(p []byte) (n int, err error) {
 	if err != nil {
 		return 0, err
 	}
-	copy(p,jsonBuffer)
-	return howManyCopied(jsonBuffer, p)
-}
-
-// returns minimium of lengths and an error to indicate
-// whether or not from fits in to
-func howManyCopied(from []byte, to []byte) (n int, err error) {
-	if lenFrom, lenTo := len(from), len(to); lenFrom > lenTo {
-		n, err = lenTo, &StateReadError{lenTo, lenFrom}
+	n = copy(p,jsonBuffer)
+	if l := len(jsonBuffer); n < l {
+		err = &StateReadError{len(p),l}
 	} else {
-		n, err = lenFrom, io.EOF
+		err = io.EOF
 	}
 	return
 }
