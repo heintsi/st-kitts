@@ -7,7 +7,7 @@ import (
 )
 
 type State struct {
-	GameID uint32
+	GameID string
 	Players []*Player
 }
 
@@ -36,6 +36,6 @@ func (s *State) Read(p []byte) (n int, err error) {
 	return
 }
 
-func ExampleState(id uint32) *State {
-	return &State{id,[]*Player{&Player{id*2}}}
+func ExampleState(id string) *State {
+	return &State{"g" + id,[]*Player{&Player{"p" + id}}}
 }
