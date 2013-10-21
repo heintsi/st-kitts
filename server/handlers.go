@@ -24,8 +24,13 @@ func PlayerHandle(w http.ResponseWriter, r *http.Request) {
 }
 
 func GameDataHandle(w http.ResponseWriter, r *http.Request) {
-	state := game.ExampleState(101)
-	io.Copy(w,state)
+	gameHash := r.URL.Path[len("/game/"):]
+	if len(gameHash) > 0 {
+		state := game.ExampleState(gameHash)
+		io.Copy(w,state)
+	} else {
+		http.Error(w, "No game id provided.", http.StatusNotFound)
+	}
 }
 
 func MapHandle(w http.ResponseWriter, r *http.Request) {
