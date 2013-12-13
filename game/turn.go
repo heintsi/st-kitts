@@ -59,8 +59,6 @@ func (t *Turn) Write(p []byte) (n int, err error) {
 // Checks if a turn is valid i.e. all required information was provided.
 // If turn was valid returns (true, nil) and if not (false, error).
 func validTurn(t *Turn) (ok bool, err error) {
-	// error message will be appended with strings
-	// []byte is needed since only slices can be appended.
 	invalidItems := t.Check()
 	if len(invalidItems) == 0 {
 		ok = true
