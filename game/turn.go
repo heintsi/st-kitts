@@ -11,7 +11,7 @@ type Checker interface {
 	Check() []string
 }
 
-// all fields must be pointers in order to check updated fields
+// All fields must be pointers in order to check updated fields
 // when unmarshaling json.
 type Turn struct {
 	Player *Player
@@ -56,8 +56,8 @@ func (t *Turn) Write(p []byte) (n int, err error) {
 	return
 }
 
-// checks if all fields in Turn are ok 
-// returns true and nil on success and false and error on failure
+// Checks if a turn is valid i.e. all required information was provided.
+// If turn was valid returns (true, nil) and if not (false, error).
 func validTurn(t *Turn) (ok bool, err error) {
 	// error message will be appended with strings
 	// []byte is needed since only slices can be appended.
@@ -70,8 +70,7 @@ func validTurn(t *Turn) (ok bool, err error) {
 	return
 }
 
-// All fields in Turn struct are checkcd. If a field is a Struct,
-// it is checked also.
+// Turn is Checked by checking its components
 func (t *Turn) Check() (invalid []string) {
 	if t == nil {
 		invalid = append(invalid, "Turn")
