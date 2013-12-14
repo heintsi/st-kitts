@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// Types which are read from user input must be checkcd agaist missing
+// Types which are read from user input must be checked against missing
 // or invalid items. The items are returned in a slice by the Check method.
 type Checker interface {
 	Check() []string
