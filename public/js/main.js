@@ -4,4 +4,24 @@ require([], function () {
 
   var serverUrl = 'http://localhost:8080';
 
+  function success(data) {
+    console.log("we have success");
+  };
+
+  var sampleTurnJSON = {
+    player: {
+      playerID: "pid01"
+    },
+    action: "someActionString"
+  };
+
+  $('#endTurn').click(function() {
+    console.log("Doing request");
+    $.post(
+      'submit/',
+      sampleTurnJSON,
+      success
+    );
+  });
+
 });

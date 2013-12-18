@@ -6,17 +6,24 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 )
 
 func IndexHandle(w http.ResponseWriter, r *http.Request) {
-	html, err := os.Open("public/index.html")
-	if err != nil {
-		http.Error(w, "Something went wrong.",
-			http.StatusInternalServerError)
-		return
+	regex := regexp.MustCompile("/([^/]*\\.[^/]*)$")
+	matches := regex.FindStringSubmatch(r.URL.Path)
+	if len(matches) > 0 {
+		mux.ServeHTTP(w, r)
+	} else {
+		html, err := os.Open("public/index.html")
+		if err != nil {
+			http.Error(w, "Something went wrong.",
+				http.StatusInternalServerError)
+			return
+		}
+		defer html.Close()
+		io.Copy(w, html)
 	}
-	defer html.Close()
-	io.Copy(w, html)
 }
 
 func PlayerHandle(w http.ResponseWriter, r *http.Request) {
@@ -38,5 +45,9 @@ func MapHandle(w http.ResponseWriter, r *http.Request) {
 }
 
 func SubmitHandle(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Nothing in %s yet", r.URL.Path[1:])
+	if r.Method == "POST" {
+		fmt.Fprint(w, "Got POST.")
+	} else {
+		fmt.Fprintf(w, "Got %s instead of POST", r.Method)
+	}
 }
