@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/heintsi/st-kitts/game"
 	"fmt"
+	"github.com/heintsi/st-kitts/game"
 	"io"
 	"net/http"
 	"os"
@@ -34,7 +34,7 @@ func GameDataHandle(w http.ResponseWriter, r *http.Request) {
 	gameHash := r.URL.Path[len("/game/"):]
 	if len(gameHash) > 0 {
 		state := game.ExampleState(gameHash)
-		io.Copy(w,state)
+		io.Copy(w, state)
 	} else {
 		http.Error(w, "No game id provided.", http.StatusNotFound)
 	}
