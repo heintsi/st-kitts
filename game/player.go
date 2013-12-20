@@ -5,13 +5,11 @@ type Player struct {
 }
 
 func (p *Player) Check() (invalid []string) {
-	if p == nil {
+	switch {
+	case p == nil:
 		invalid = append(invalid, "Player")
-	} else {
-		switch {
-		case p.PlayerID == "":
-			invalid = append(invalid, "Player.PlayerID")
-		}
+	case p.PlayerID == "":
+		invalid = append(invalid, "Player.PlayerID")
 	}
 	return
 }

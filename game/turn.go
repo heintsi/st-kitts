@@ -23,13 +23,11 @@ type Action struct {
 }
 
 func (a *Action) Check() (invalid []string) {
-	if a == nil {
+	switch {
+	case a == nil:
 		invalid = append(invalid, "Action")
-	} else {
-		switch {
-		case a.Type == "":
-			invalid = append(invalid, "Action.Type")
-		}
+	case a.Type == "":
+		invalid = append(invalid, "Action.Type")
 	}
 	return
 }
