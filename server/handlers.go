@@ -9,21 +9,29 @@ import (
 	"regexp"
 )
 
-func IndexHandle(w http.ResponseWriter, r *http.Request) {
-	regex := regexp.MustCompile("/([^/]*\\.[^/]*)$")
-	matches := regex.FindStringSubmatch(r.URL.Path)
-	if len(matches) > 0 {
+func StaticFileHandle(w http.ResponseWriter, r *http.Request) {
+	if isValidStaticFileRequest(r) {
 		mux.ServeHTTP(w, r)
 	} else {
-		html, err := os.Open("public/index.html")
-		if err != nil {
-			http.Error(w, "Something went wrong.",
-				http.StatusInternalServerError)
-			return
-		}
-		defer html.Close()
-		io.Copy(w, html)
+		serveIndexHtml(w)
 	}
+}
+
+func serveIndexHtml(w http.ResponseWriter) {
+	html, err := os.Open("public/index.html")
+	if err != nil {
+	http.Error(w, "Something went wrong.",
+			http.StatusInternalServerError)
+		return
+	}
+	defer html.Close()
+	io.Copy(w, html)
+}
+
+func isValidStaticFileRequest(r *http.Request) (bool) {
+	regex := regexp.MustCompile("(?:/[^/]*)+\\.(?:html|css|js)$")
+	matches := regex.FindStringSubmatch(r.URL.Path)
+	return len(matches) > 0
 }
 
 func PlayerHandle(w http.ResponseWriter, r *http.Request) {
