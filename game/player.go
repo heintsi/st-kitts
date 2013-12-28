@@ -1,15 +1,14 @@
 package game
 
+type PlayerID string
+
 type Player struct {
-	PlayerID string
+	PlayerID PlayerID
 }
 
-func (p *Player) Check() (invalid []string) {
-	switch {
-	case p == nil:
-		invalid = append(invalid, "Player")
-	case p.PlayerID == "":
-		invalid = append(invalid, "Player.PlayerID")
+func (id *PlayerID) check() (invalid []string) {
+	if id == nil || string(*id) == "" {
+		invalid = append(invalid, "PlayerID")
 	}
 	return
 }

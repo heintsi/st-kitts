@@ -6,23 +6,26 @@ import (
 )
 
 // Types which are read from user input must be checked against missing
-// or invalid items. The items are returned in a slice by the Check method.
-type Checker interface {
-	Check() []string
+// or invalid items. The items are returned in a slice by the check method.
+type checker interface {
+	check() []string
 }
 
-// All fields must be pointers in order to check updated fields
-// when unmarshaling json.
+// Turn structure contains fields which will be parsed from JSON
+// and eventually submitted to game state generator.
 type Turn struct {
-	Player *Player
+	GameID GameID
+	PlayerID PlayerID
+	// Pointer value *Action needed for json unmarshaling.
 	Action *Action
 }
 
+// Action contains player's move.
 type Action struct {
 	Type string
 }
 
-func (a *Action) Check() (invalid []string) {
+func (a *Action) check() (invalid []string) {
 	switch {
 	case a == nil:
 		invalid = append(invalid, "Action")
@@ -32,8 +35,8 @@ func (a *Action) Check() (invalid []string) {
 	return
 }
 
+// TurnWriteError is used to indicate missing items in an invalid turn.
 type TurnWriteError struct {
-	// contains items which were not provided when submitting the turn
 	MissingItems []string
 }
 
@@ -41,6 +44,9 @@ func (e *TurnWriteError) Error() string {
 	return fmt.Sprintf("JSON write failed since invalid:%v", e.MissingItems)
 }
 
+// Tranform JSON in p to a turn structure. All required fields in turn must be
+// provided. If some fields are missing an error containing the missing fields
+// is returned.
 func (t *Turn) Write(p []byte) (n int, err error) {
 	var ok bool
 	err = json.Unmarshal(p, t)
@@ -57,7 +63,7 @@ func (t *Turn) Write(p []byte) (n int, err error) {
 // Checks if a turn is valid i.e. all required information was provided.
 // If turn was valid returns (true, nil) and if not (false, error).
 func validTurn(t *Turn) (ok bool, err error) {
-	invalidItems := t.Check()
+	invalidItems := t.check()
 	if len(invalidItems) == 0 {
 		ok = true
 	} else {
@@ -66,13 +72,25 @@ func validTurn(t *Turn) (ok bool, err error) {
 	return
 }
 
-// Turn is Checked by checking its components
-func (t *Turn) Check() (invalid []string) {
+func (t *Turn) check() (invalid []string) {
+	// Turn is Checked by checking its components
 	if t == nil {
 		invalid = append(invalid, "Turn")
-	} else {
-		invalid = append(invalid, t.Player.Check()...)
-		invalid = append(invalid, t.Action.Check()...)
+		return
 	}
+	invalid = append(invalid, t.GameID.check()...)
+	invalid = append(invalid, t.PlayerID.check()...)
+	invalid = append(invalid, t.Action.check()...)
 	return
+}
+
+// Sends turn struct to procedure which computes a new game state.
+func (t *Turn) Submit() {
+	state, err := t.GameID.GetState()
+	// the turn should be ok if checked properly. If GameID is somehow
+	// wrong, there is not much to be done here.
+	if err != nil {
+		panic(fmt.Sprintf("Invalid GameID %v", t.GameID))
+	}
+	state.turnChannel <- t
 }

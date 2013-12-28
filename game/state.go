@@ -6,9 +6,13 @@ import (
 	"io"
 )
 
+// Game state contains all information for a single round of a game.
+// After each round a new state is computed by updating it with actions
+// from players.
 type State struct {
-	GameID string
+	GameID GameID
 	Players []*Player
+	turnChannel chan<- *Turn
 }
 
 type StateReadError struct {
@@ -21,7 +25,8 @@ func (e *StateReadError) Error() string {
 		e.BufferLength, e.JsonLength)
 }
 
-// Reading a State produces JSON encoded State in p
+// State's Read is used to tranform go struct to JSON.
+// The JSON is written in p.
 func (s *State) Read(p []byte) (n int, err error) {
 	jsonBuffer, err := json.Marshal(s)
 	if err != nil {
@@ -37,5 +42,5 @@ func (s *State) Read(p []byte) (n int, err error) {
 }
 
 func ExampleState(id string) *State {
-	return &State{"g" + id,[]*Player{&Player{"p" + id}}}
+	return &State{GameID("g" + id),[]*Player{&Player{PlayerID("p" + id)}},nil}
 }
