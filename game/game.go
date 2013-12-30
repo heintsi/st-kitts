@@ -15,18 +15,22 @@ import (
 
 type (
 	// Game ID is used to identify each game instance.
-	GameID             string
+	GameID string
 	// Invalid game id error is used when trying to get a state not in play
 	// or creating a game with game id currently in use.
 	InvalidGameIDError GameID
 )
 
-// Games currently played are stored in games.InPlay which is made
-// suitable for concurrent use with reader/writer mutex.
-var games = struct {
-	inPlay map[GameID]*State
-	mutex  sync.RWMutex
-}{inPlay: make(map[GameID]*State)}
+var (
+	// Games currently played are stored in games.InPlay which is made
+	// suitable for concurrent use with reader/writer mutex.
+	games = struct {
+		inPlay map[GameID]*State
+		mutex  sync.RWMutex
+	}{inPlay: make(map[GameID]*State)}
+	// Turn channel is used to input players' turns
+	TurnChannel chan *Turn
+)
 
 // A new game is created and a unique game id is assigned if successful. 
 // The game id can be input as arguments or one can let the procedure
@@ -54,15 +58,17 @@ func New(GameIDs ...string) (id GameID, err error) {
 func initializeGameState(id GameID) {
 	state := new(State)
 	state.GameID = id
-	state.turnChannel = make(chan<- *Turn)
+	// launch turn updater here?
 	games.mutex.Lock()
 	defer games.mutex.Unlock()
 	games.inPlay[id] = state
 }
 
-func (id *GameID) exists() bool {
-	// Game id exists if its invalid list is empty.
-	return len(id.check()) == 0
+func (id *GameID) exists() (ok bool) {
+	games.mutex.RLock()
+	defer games.mutex.RUnlock()
+	_, ok = games.inPlay[*id]
+	return
 }
 
 func gameIDFromString(strID string) GameID {
@@ -73,23 +79,24 @@ func (e InvalidGameIDError) Error() string {
 	return fmt.Sprintf("Invalid game id %s", e)
 }
 
-// Retreives a game state corresponding to game id. If not found
+// Retreives a copy of game state corresponding to game id. If not found
 // returns an InvalidGameIDError.
 func (id *GameID) GetState() (s *State, err error) {
-	var ok bool
 	games.mutex.RLock()
 	defer games.mutex.RUnlock()
-	s, ok = games.inPlay[*id]
+	state, ok := games.inPlay[*id]
 	if !ok {
 		err = InvalidGameIDError(*id)
+	} else {
+		s = new(State)
+		*s = *state
 	}
 	return
 }
 
 // Checks if a game id is valid, i.e. is found in games map.
 func (id *GameID) check() (invalid []string) {
-	_, err := id.GetState()
-	if err != nil {
+	if !id.exists() {
 		invalid = append(invalid, "GameID")
 	}
 	return
