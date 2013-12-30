@@ -10,14 +10,16 @@ import (
 // After each round a new state is computed by updating it with actions
 // from players.
 type State struct {
-	GameID GameID
+	GameID  GameID
+	Round	int
 	Players []*Player
-	turnChannel chan<- *Turn
+	// Non-exportet view in Players. Used for new state calculation.
+	players map[PlayerID]*Player
 }
 
 type StateReadError struct {
 	BufferLength int
-	JsonLength int
+	JsonLength   int
 }
 
 func (e *StateReadError) Error() string {
@@ -32,15 +34,30 @@ func (s *State) Read(p []byte) (n int, err error) {
 	if err != nil {
 		return 0, err
 	}
-	n = copy(p,jsonBuffer)
+	n = copy(p, jsonBuffer)
 	if l := len(jsonBuffer); n < l {
-		err = &StateReadError{len(p),l}
+		err = &StateReadError{len(p), l}
 	} else {
 		err = io.EOF
 	}
 	return
 }
 
+func (s *State) allPlayersReady() bool {
+	for _, player := range s.Players {
+		if !player.Ready {
+			return false
+		}
+	}
+	return true
+}
+
+func (s *State) setAllPlayersNotReady() {
+	for _, player := range s.Players {
+		player.Ready = false
+	}
+}
+
 func ExampleState(id string) *State {
-	return &State{GameID("g" + id),[]*Player{&Player{PlayerID("p" + id)}},nil}
+	return new(State)
 }

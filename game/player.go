@@ -3,7 +3,10 @@ package game
 type PlayerID string
 
 type Player struct {
-	PlayerID PlayerID
+	Name string
+	Ready bool
+	id PlayerID
+	turn *Turn
 }
 
 func (id *PlayerID) check() (invalid []string) {
@@ -11,4 +14,14 @@ func (id *PlayerID) check() (invalid []string) {
 		invalid = append(invalid, "PlayerID")
 	}
 	return
+}
+
+func (p *Player) turnReady(t *Turn) {
+	p.turn = t
+	p.Ready = true
+}
+
+func (p *Player) turnNotReady(t *Turn) {
+	p.turn = nil
+	p.Ready = false
 }
