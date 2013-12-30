@@ -20,7 +20,7 @@ func StaticFileHandle(w http.ResponseWriter, r *http.Request) {
 func serveIndexHtml(w http.ResponseWriter) {
 	html, err := os.Open("public/index.html")
 	if err != nil {
-	http.Error(w, "Something went wrong.",
+		http.Error(w, "Something went wrong.",
 			http.StatusInternalServerError)
 		return
 	}
@@ -28,7 +28,7 @@ func serveIndexHtml(w http.ResponseWriter) {
 	io.Copy(w, html)
 }
 
-func isValidStaticFileRequest(r *http.Request) (bool) {
+func isValidStaticFileRequest(r *http.Request) bool {
 	regex := regexp.MustCompile("(?:/[^/]*)+\\.(?:html|css|js)$")
 	matches := regex.FindStringSubmatch(r.URL.Path)
 	return len(matches) > 0
@@ -53,8 +53,13 @@ func MapHandle(w http.ResponseWriter, r *http.Request) {
 }
 
 func SubmitHandle(w http.ResponseWriter, r *http.Request) {
+	var turn game.Turn
 	if r.Method == "POST" {
-		fmt.Fprint(w, "Got POST.")
+		_, err = io.Copy(turn, r.Body)
+		if err != nil {
+			fmt.Fprint(w, "Error: %v", err)
+		}
+		go turn.Submit()
 	} else {
 		fmt.Fprintf(w, "Got %s instead of POST", r.Method)
 	}
