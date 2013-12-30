@@ -14,7 +14,7 @@ type checker interface {
 // Turn structure contains fields which will be parsed from JSON
 // and eventually submitted to game state generator.
 type Turn struct {
-	GameID GameID
+	GameID   GameID
 	PlayerID PlayerID
 	// Pointer value *Action needed for json unmarshaling.
 	Action *Action
@@ -86,11 +86,10 @@ func (t *Turn) check() (invalid []string) {
 
 // Sends turn struct to procedure which computes a new game state.
 func (t *Turn) Submit() {
-	state, err := t.GameID.GetState()
 	// the turn should be ok if checked properly. If GameID is somehow
 	// wrong, there is not much to be done here.
-	if err != nil {
+	if !t.GameID.exists() {
 		panic(fmt.Sprintf("Invalid GameID %v", t.GameID))
 	}
-	state.turnChannel <- t
+	TurnChannel <- t
 }
