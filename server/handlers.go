@@ -34,10 +34,6 @@ func isValidStaticFileRequest(r *http.Request) bool {
 	return len(matches) > 0
 }
 
-func PlayerHandle(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Nothing in %s yet", r.URL.Path[1:])
-}
-
 func GameDataHandle(w http.ResponseWriter, r *http.Request) {
 	gameHash := r.URL.Path[len("/game/"):]
 	if len(gameHash) > 0 {
@@ -48,14 +44,10 @@ func GameDataHandle(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func MapHandle(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Nothing in %s yet", r.URL.Path[1:])
-}
-
 func SubmitHandle(w http.ResponseWriter, r *http.Request) {
-	var turn game.Turn
+	var turn *game.Turn
 	if r.Method == "POST" {
-		_, err = io.Copy(turn, r.Body)
+		_, err := io.Copy(turn, r.Body)
 		if err != nil {
 			fmt.Fprint(w, "Error: %v", err)
 		}
