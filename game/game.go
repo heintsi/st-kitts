@@ -64,6 +64,10 @@ func initializeGameState(id GameID) {
 	games.inPlay[id] = state
 }
 
+func (id *GameID) String() string {
+	return string(*id)
+}
+
 func (id *GameID) exists() (ok bool) {
 	games.mutex.RLock()
 	defer games.mutex.RUnlock()
