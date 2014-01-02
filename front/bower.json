@@ -1,0 +1,11 @@
+{
+  "name": "st-kitts",
+  "private": true,
+  "dependencies": {
+    "jquery": "~1.10.2",
+    "backbone": "~1.1.0",
+    "underscore": "~1.5.2",
+    "requirejs": "~2.1.9"
+  },
+  "devDependencies": {}
+}
