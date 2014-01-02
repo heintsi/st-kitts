@@ -18,7 +18,7 @@ func StaticFileHandle(w http.ResponseWriter, r *http.Request) {
 }
 
 func serveIndexHtml(w http.ResponseWriter) {
-	html, err := os.Open("public/index.html")
+	html, err := os.Open("front/dist/index.html")
 	if err != nil {
 		http.Error(w, "Something went wrong.",
 			http.StatusInternalServerError)
