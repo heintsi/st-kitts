@@ -2,6 +2,9 @@
 *.o
 *.a
 *.so
+front/node_modules/
+front/src/lib/
+front/dist/
 
 # Folders
 _obj
