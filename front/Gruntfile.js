@@ -19,7 +19,7 @@ module.exports = function(grunt) {
     },
 
     copy: {
-      dist: {
+      dev: {
         files: [{
           expand: true,
           dot: true,
@@ -27,11 +27,35 @@ module.exports = function(grunt) {
           dest: '<%= app.dist %>',
           src: [
             'scripts/st-kitts.js',
-            '*.{ico,png,txt}',
-            'lib/*/*.js',
             '{,*/}*.html',
             'styles/*.css'
           ]
+        }]
+      },
+      lib: {
+        files: [{
+          expand: true,
+          dot: false,
+          cwd: '<%= app.src %>',
+          dest: '<%= app.dist %>',
+          src: [
+            'lib/requirejs/require.js',
+            'lib/jquery/jquery.js',
+            'lib/underscore/underscore.js'
+          ]
+        }]
+      }
+    },
+
+    sync: {
+      dev: {
+        files: [{
+          cwd: 'src/',
+          src: [
+            'scripts/*.js',
+            'index.html'
+          ],
+          dest: 'dist'
         }]
       }
     },
@@ -52,11 +76,14 @@ module.exports = function(grunt) {
     },
 
     watch: {
-      options: {
-        livereload: true
-      },
-      files: ['<%= jshint.files %>'],
-      tasks: ['jshint']
+      sync: {
+        files: [
+          'scripts/*.js',
+          '{,*/}*.html',
+          'styles/*.css'
+        ],
+        tasks: ['sync:dev']
+      }
     },
 
     // Empties folders to start fresh
@@ -76,15 +103,14 @@ module.exports = function(grunt) {
     connect: {
       options: {
         port: 9000,
-        livereload: 35729,
         // Change this to '0.0.0.0' to access the server from outside
         hostname: 'localhost'
       },
-      livereload: {
+      dev: {
         options: {
           open: true,
           base: [
-            '<%= app.src %>'
+            '<%= app.dist %>'
           ]
         }
       },
@@ -95,13 +121,6 @@ module.exports = function(grunt) {
             '<%= app.tests %>',
             '<%= app.src %>'
           ]
-        }
-      },
-      dist: {
-        options: {
-          open: true,
-          base: '<%= app.dist %>',
-          livereload: false
         }
       }
     }
@@ -124,15 +143,14 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('run', [
-    'connect:livereload',
+    'default',
+    'connect:dev',
     'watch'
   ]);
 
   grunt.registerTask('prod', [
-    'inspect',
-    'test',
-    'build',
-    'connect:dist:keepalive'
+    'default',
+    'connect:dev:keepalive'
   ]);
 
   grunt.registerTask('default', [
