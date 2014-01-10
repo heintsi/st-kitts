@@ -11,7 +11,7 @@ import (
 // from players.
 type State struct {
 	GameID  GameID
-	Round	int
+	Round   int
 	Players []*Player
 	// Non-exportet view in Players. Used for new state calculation.
 	players map[PlayerID]*Player

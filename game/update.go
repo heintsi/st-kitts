@@ -13,7 +13,7 @@ func updateState(t *Turn) {
 	defer games.mutex.Unlock()
 	state := games.inPlay[t.GameID]
 	state.players[t.PlayerID].turnReady(t)
-	if (state.allPlayersReady()) {
+	if state.allPlayersReady() {
 		computeNew(state)
 	}
 }

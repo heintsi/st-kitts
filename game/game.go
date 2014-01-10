@@ -69,7 +69,7 @@ func initializeGameState(id GameID) {
 func End(GameIDs ...GameID) {
 	games.mutex.Lock()
 	defer games.mutex.Unlock()
-	for _, gid := range(GameIDs) {
+	for _, gid := range GameIDs {
 		delete(games.inPlay, gid)
 	}
 }

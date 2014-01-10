@@ -3,10 +3,10 @@ package game
 type PlayerID string
 
 type Player struct {
-	Name string
+	Name  string
 	Ready bool
-	id PlayerID
-	turn *Turn
+	id    PlayerID
+	turn  *Turn
 }
 
 func (id *PlayerID) check() (invalid []string) {
