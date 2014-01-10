@@ -64,6 +64,16 @@ func initializeGameState(id GameID) {
 	games.inPlay[id] = state
 }
 
+// Ends provided games. Game IDs are removed from games in pläy map.
+// No error is returned if some of the game IDs do not exist.
+func End(GameIDs ...GameID) {
+	games.mutex.Lock()
+	defer games.mutex.Unlock()
+	for _, gid := range(GameIDs) {
+		delete(games.inPlay, gid)
+	}
+}
+
 func (id *GameID) String() string {
 	return string(*id)
 }
