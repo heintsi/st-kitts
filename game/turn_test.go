@@ -84,7 +84,7 @@ func testSuccessfulWrite(t *testing.T) {
 				"Type" : "TestAction"
 			}
 		}`)
-	var turn *Turn
+	turn := new(Turn)
 	_, err := turn.Write(validTurnJson)
 	if err != nil {
 		t.Errorf("Valid turn.Write failed with error %v", err)
@@ -102,7 +102,7 @@ func testFailingWrite(t *testing.T) {
 			"GameID" : "TestGame",
 			"PlayerID" : "TestPlayer"
 		 }`)
-	var turn *Turn
+	turn := new(Turn)
 	_, err := turn.Write(invalidTurnJson)
 	if err == nil {
 		t.Errorf("Invalid turn.Write succeeded with turn %v", turn)
